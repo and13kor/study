@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .button{
+            width: 100px;
+            height: 100px;
+            background-color: aquamarine;
+            padding: 10px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.5s;
+            font-size: 10px;
+            &:hover{
+                background-color: aqua;
+                width: 140px;
+                height: 140px;
+                font-size: 18px;
+            }
+
+        }
+    </style>
+
+
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=bc898c4a-3458-4522-9d83-b8d08fefcffa" type="text/javascript"></script>
+    <script src="event_reverse_geocode.js" type="text/javascript"></script>
+    <style type="text/css">
+        html, body {
+            width: 100%;
+            height: 95%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial;
+            font-size: 14px;
+        }
+        .mapBG {
+            width: 500px;
+            height: 500px;
+        }
+        .header {
+            padding: 5px;
+        }
+    </style>
+
+
+    <script>
+        window.addEventListener('load', function() { 
+        ymaps.ready(initMap)
+        function initMap() {
+            
+    //КАРТЫ
+    /*
+    ;
+    function initMap() {
+    console.log('карты загрузились');
+*/
+
+
+    //КАРТА
+    function startMap(idMap){
+            
+            let myPlacemark,
+                myMap = new ymaps.Map(idMap, {
+                    center: [55.753994, 37.622093],
+                    zoom: 9
+                }, {
+                    searchControlProvider: 'yandex#search'
+                });
+
+            // Слушаем клик на карте.
+            myMap.events.add('click', function (e) {
+                let coords = e.get('coords');
+                
+                // Если метка уже создана – просто передвигаем ее.
+                if (myPlacemark) {
+                    myPlacemark.geometry.setCoordinates(coords);
+                   
+                }
+                // Если нет – создаем.
+                else {
+                    
+                    myPlacemark = createPlacemark(coords);
+                    myMap.geoObjects.add(myPlacemark);
+                    // Слушаем событие окончания перетаскивания на метке.
+                    myPlacemark.events.add('dragend', function () {
+                        getAddress(myPlacemark.geometry.getCoordinates());
+                    });
+                }
+                getAddress(coords);
+                
+            });
+
+            // Создание метки.
+            function createPlacemark(coords) {
+                return new ymaps.Placemark(coords, {
+                    iconCaption: 'поиск...'
+                }, {
+                    preset: 'islands#violetDotIconWithCaption',
+                    draggable: true
+                });
+            }
+
+            // Определяем адрес по координатам (обратное геокодирование).
+            function getAddress(coords) {
+                myPlacemark.properties.set('iconCaption', 'поиск...');
+                ymaps.geocode(coords).then(function (res) {
+                    let firstGeoObject = res.geoObjects.get(0);
+                    console.log( firstGeoObject.getAddressLine()); // МИЛАЯ, ТАК МОЖНО ПОЛУЧИТЬ АДРЕСС ДЛЯ ВСТАВКИ
+                    myPlacemark.properties
+                        .set({
+                            // Формируем строку с данными об объекте.
+                            iconCaption: [
+                                // Название населенного пункта или вышестоящее административно-территориальное образование.
+                                firstGeoObject.getLocalities().length ? firstGeoObject.getLocalities() : firstGeoObject.getAdministrativeAreas(),
+                                // Получаем путь до топонима, если метод вернул null, запрашиваем наименование здания.
+                                firstGeoObject.getThoroughfare() || firstGeoObject.getPremise()
+                            ].filter(Boolean).join(', '),
+                            // В качестве контента балуна задаем строку с адресом объекта.
+                            balloonContent: firstGeoObject.getAddressLine()
+                        });
+                });
+            }
+
+
+
+    }
+
+
+
+    
+        
+        
+    
+
+        
+        //декларативный стиль
+        
+        let go = () => {
+            let area = document.querySelector('.area');
+            let tmpl = document.querySelector('#tmpl');
+            let item = tmpl.content.cloneNode(true);
+            let count = document.querySelectorAll('.point').length;
+            item.querySelector('#name').innerHTML = 'Ого ' + (count + 1);
+            item.querySelector('#name').setAttribute('id', 'section' + count);
+            item.querySelector('#map').setAttribute('id', 'map' + count);
+            area.append(item);
+            let nameMap = 'map' + count
+            startMap(nameMap);
+            }
+
+
+        document.querySelector('.button').addEventListener('click', go);
+    
+
+       
+        
+/*
+
+        //ООП стиль
+        function GenerateElem(obj){ // функция для генерации объектов может понадобиться, но пока там нет ничего супер нужного, но оставил
+                     this.hi = function(){
+                        console.log('hi')
+                     };
+                     this.itemObject = obj;
+                }  
+        let listForms = {} //объект для хранения объектов форм
+        let button = document.querySelector('.button').addEventListener('click', function() {
+            let count = document.querySelectorAll('.point').length;
+            let area = document.querySelector('.area');
+            let tmpl = document.querySelector('#tmpl');
+            let item = tmpl.content.cloneNode(true);
+            item.querySelector('#name').innerHTML = 'Упс ' + (count + 1);
+            item.querySelector('#name').setAttribute('id', 'section' + count);
+            area.append(item);
+            let itemform = new GenerateElem(document.querySelector('#section' + count));
+            let nameForm = 'form' + count;
+            Object.defineProperty(listForms, nameForm, {
+                value: itemform
+            });
+                  console.log(listForms);
+        });
+        */
+
+    
+      
+      
+
+                
+
+
+
+
+
+
+         }
+    })
+    </script>
+</head>
+<body>
+    
+    <!-- кнопка-->
+    <template id="tmpl">
+                <li>
+                    <p class="point" id="name">Название 1</p>
+                    <div id="map" class="mapBG"></div>
+                </li>
+    </template>
+
+    <div class="button"><p>Ой, ну кликни уже меня!</p></div>
+    <ul class="area"></ul>
+
+
+<!-- Карты-->
+    
+
+</body>
+</html>
